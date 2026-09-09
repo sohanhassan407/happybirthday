@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Happy Birthday</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: #0a0508;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Noto Sans Bengali', system-ui, sans-serif;
+            touch-action: manipulation;
+        }
+
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: linear-gradient(145deg, #ffb6c1, #ff8da1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            opacity: 1;
+            visibility: visible;
+        }
+        #loadingScreen.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loader-dots {
+            display: flex;
+            gap: 16px;
+        }
+        .loader-dots span {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.85);
+            animation: dotBounce 1.2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        .loader-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loader-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes dotBounce {
+            0%,
+            80%,
+            100% {
+                transform: scale(0.5);
+                opacity: 0.3;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .stage {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+        video#bgVideo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+        .overlay-shade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.05) 28%, rgba(0, 0, 0, 0) 55%);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .controls {
+            position: absolute;
+            left: 50%;
+            bottom: 6%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            z-index: 5;
+        }
+        #clickBtn {
+            position: relative;
+            padding: 13px 34px;
+            font-size: 15px;
+            letter-spacing: 0.06em;
+            color: #fff8f6;
+            background: linear-gradient(135deg, #c81f4d, #ff5c7a);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(200, 31, 77, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.4s ease, background 0.6s ease, border-color 0.6s ease, filter 0.6s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: manipulation;
+            text-align: center;
+            min-width: 140px;
+            white-space: nowrap;
+        }
+        #clickBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(200, 31, 77, 0.55);
+        }
+        #clickBtn:active:not(:disabled) {
+            transform: translateY(0px) scale(0.97);
+        }
+        #clickBtn:disabled {
+            opacity: 0.45;
+            cursor: default;
+            transform: none;
+            box-shadow: none;
+            pointer-events: none;
+        }
+        #clickBtn.deep {
+            background: linear-gradient(135deg, #5c0a20, #9e143a) !important;
+            border-color: rgba(255, 255, 255, 0.10) !important;
+            box-shadow: 0 4px 18px rgba(90, 10, 30, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+            filter: saturate(0.6);
+            opacity: 0.70 !important;
+            pointer-events: none !important;
+        }
+
+        #refreshBtn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(20, 10, 14, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: #fff8f6;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease, background 0.2s ease;
+            touch-action: manipulation;
+        }
+        #refreshBtn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #refreshBtn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(35deg);
+        }
+        #refreshBtn:active {
+            transform: rotate(35deg) scale(0.92);
+        }
+
+        .hearts-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 22px;
+            color: #ff5c7a;
+            text-shadow: 0 0 14px rgba(255, 92, 122, 0.6);
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        @keyframes heartRise {
+            0% {
+                opacity: 0;
+                transform: translate(var(--sx), var(--sy)) scale(0.3) rotate(var(--r0));
+            }
+            10% {
+                opacity: 1;
+            }
+            75% {
+                opacity: 0.85;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--ex), var(--ey)) scale(var(--sc)) rotate(var(--r1));
+            }
+        }
+        @keyframes heartFloat {
+            0% {
+                opacity: 0;
+                transform: translate(var(--sx), var(--sy)) scale(0.4) rotate(var(--r0));
+            }
+            15% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 0.80;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--ex), var(--ey)) scale(var(--sc)) rotate(var(--r1));
+            }
+        }
+
+        .birthday-text {
+            position: absolute;
+            font-size: 16px;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 6;
+            will-change: transform, opacity;
+            text-shadow: 0 0 18px rgba(255, 80, 130, 0.6), 0 0 40px rgba(255, 50, 100, 0.25);
+            font-family: 'Segoe UI', 'Noto Sans Bengali', system-ui, sans-serif;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+        @keyframes birthdayFloat {
+            0% {
+                opacity: 0;
+                transform: translate(var(--sx), var(--sy)) scale(0.6) rotate(var(--r0));
+            }
+            12% {
+                opacity: 1;
+                transform: translate(var(--sx), var(--sy)) scale(0.9) rotate(var(--r0));
+            }
+            80% {
+                opacity: 0.95;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--ex), var(--ey)) scale(1.1) rotate(var(--r1));
+            }
+        }
+
+        .stage-label {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.50);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+        }
+        .stage-label.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            #clickBtn {
+                padding: 11px 24px;
+                font-size: 14px;
+                min-width: 120px;
+            }
+            .loader-dots span {
+                width: 14px;
+                height: 14px;
+                gap: 12px;
+            }
+            .birthday-text {
+                font-size: 13px;
+            }
+        }
+        @media (max-width: 380px) {
+            .birthday-text {
+                font-size: 11px;
+            }
+            #clickBtn {
+                padding: 9px 18px;
+                font-size: 12px;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loadingScreen">
+        <div class="loader-dots">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+
+    <div class="stage">
+        <video id="bgVideo" src="hello.mp4" playsinline preload="auto"></video>
+        <div class="overlay-shade"></div>
+        <div class="hearts-layer" id="heartsLayer"></div>
+
+        <div class="stage-label" id="stageLabel">❤️</div>
+
+        <div class="controls">
+            <button id="refreshBtn" title="পুনরায় শুরু">↻</button>
+            <button id="clickBtn">Click PlZ😫</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" src="hello.mp3" loop preload="auto"></audio>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const loadingScreen = document.getElementById('loadingScreen');
+            const video = document.getElementById('bgVideo');
+            const music = document.getElementById('bgMusic');
+            const clickBtn = document.getElementById('clickBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const heartsLayer = document.getElementById('heartsLayer');
+            const stageLabel = document.getElementById('stageLabel');
+
+            // ভিডিওর সাউন্ড চালু
+            video.muted = false;
+
+            // ─── নতুন টাইমলাইন ──────────────────────────────────────
+            // 0.19 একই, 1.20 → 1.50 (0.30 যোগ), বাকি একই
+            const stops = [0.19, 1.50, 3.03, 4.05, 19.00];
+            let stage = 0;
+            let musicStarted = false;
+            let lastClickDone = false;
+            let isPlaying = false;
+            let isSeeking = false;
+
+            let birthdayInterval = null;
+            let birthdayTexts = [];
+            let isBirthdayActive = false;
+            let textBurstCount = 1;
+
+            const textVariants = ['Happy Birthday💖', 'Keya😫💖', 'love you😫'];
+
+            let loadingHidden = false;
+
+            // ─── loading screen ──────────────────────────────────────
+            function hideLoading() {
+                if (loadingHidden) return;
+                loadingHidden = true;
+                loadingScreen.classList.add('hide');
+                video.currentTime = stops[0];
+                updateLabel();
+            }
+
+            function onVideoReady() {
+                if (video.readyState >= 2) {
+                    hideLoading();
+                } else {
+                    video.addEventListener('canplaythrough', hideLoading, { once: true });
+                    video.addEventListener('loadedmetadata', hideLoading, { once: true });
+                    setTimeout(hideLoading, 4000);
+                }
+            }
+            onVideoReady();
+
+            // ─── restart ─────────────────────────────────────────────
+            function goToRest() {
+                video.pause();
+                video.currentTime = stops[0];
+                clickBtn.classList.remove('deep');
+                clickBtn.disabled = false;
+                lastClickDone = false;
+                refreshBtn.classList.remove('show');
+                stage = 0;
+                isPlaying = false;
+                isSeeking = false;
+                video.removeEventListener('timeupdate', onTimeUpdate);
+                heartsLayer.innerHTML = '';
+                updateLabel();
+                stopBirthdayTexts();
+                textBurstCount = 1;
+
+                music.pause();
+                music.currentTime = 0;
+                musicStarted = false;
+            }
+
+            function startMusic() {
+                if (musicStarted) return;
+                musicStarted = true;
+                music.volume = 0.50;
+                music.play().catch(function() { musicStarted = false; });
+            }
+
+            function updateLabel() {
+                const labels = ['', '✨', '💕', '🌹', '❤️‍🔥'];
+                const idx = Math.min(stage, labels.length - 1);
+                stageLabel.textContent = labels[idx];
+                stageLabel.classList.add('show');
+            }
+
+            // ─── ধীরে ধীরে লাভ ──────────────────────────────────────
+            function spawnHeartsGradually(totalCount, delayBetween, heartsPerBatch) {
+                let spawned = 0;
+                const interval = setInterval(function() {
+                    const batch = Math.min(heartsPerBatch, totalCount - spawned);
+                    for (let i = 0; i < batch; i++) {
+                        spawnSingleHeart();
+                    }
+                    spawned += batch;
+                    if (spawned >= totalCount) {
+                        clearInterval(interval);
+                    }
+                }, delayBetween);
+            }
+
+            function spawnSingleHeart() {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                const btnRect = clickBtn.getBoundingClientRect();
+                const btnCX = btnRect.left + btnRect.width / 2;
+                const btnCY = btnRect.top + btnRect.height / 2;
+
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '&#10084;';
+
+                let startX, startY;
+                if (Math.random() > 0.5) {
+                    const fromLeft = Math.random() > 0.5;
+                    startY = h * (0.12 + Math.random() * 0.70);
+                    startX = fromLeft ? -20 : w + 20;
+                } else {
+                    const spread = 30 + Math.random() * 55;
+                    const angle = Math.random() * 2 * Math.PI;
+                    startX = btnCX + Math.cos(angle) * spread;
+                    startY = btnCY + Math.sin(angle) * spread - 8;
+                    startX = Math.max(-10, Math.min(w + 10, startX));
+                    startY = Math.max(0, Math.min(h, startY));
+                }
+
+                const midX = w * (0.15 + Math.random() * 0.70);
+                const endY = startY - (100 + Math.random() * 260);
+                const size = 13 + Math.random() * 26;
+                const dur = 2.0 + Math.random() * 2.2;
+                const delay = Math.random() * 0.55;
+
+                heart.style.left = '0px';
+                heart.style.top = '0px';
+                heart.style.fontSize = size + 'px';
+                heart.style.setProperty('--sx', startX + 'px');
+                heart.style.setProperty('--sy', startY + 'px');
+                heart.style.setProperty('--ex', midX + 'px');
+                heart.style.setProperty('--ey', endY + 'px');
+
+                const rot0 = (Math.random() - 0.5) * 70;
+                const rot1 = (Math.random() - 0.5) * 80;
+                heart.style.setProperty('--r0', rot0 + 'deg');
+                heart.style.setProperty('--r1', rot1 + 'deg');
+                heart.style.setProperty('--sc', (0.6 + Math.random() * 1.0).toFixed(2));
+                heart.style.animation = 'heartRise ' + dur + 's ease-out ' + delay + 's forwards';
+
+                const hue = 330 + Math.random() * 35;
+                heart.style.color = 'hsl(' + hue + ', 92%, 62%)';
+
+                heartsLayer.appendChild(heart);
+                setTimeout(function() {
+                    if (heart.parentNode) heart.remove();
+                }, (dur + delay) * 1000 + 300);
+            }
+
+            // ─── birthday text ──────────────────────────────────────
+            function spawnBirthdayText() {
+                if (!isBirthdayActive) return;
+
+                let count = Math.min(textBurstCount, 5);
+                count = Math.max(1, count + (Math.random() > 0.6 ? 1 : 0));
+                if (textBurstCount < 5) {
+                    textBurstCount += 0.05;
+                }
+
+                for (let i = 0; i < count; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'birthday-text';
+                    const randomText = textVariants[Math.floor(Math.random() * textVariants.length)];
+                    el.textContent = randomText;
+
+                    const w = window.innerWidth;
+                    const h = window.innerHeight;
+                    const edge = Math.floor(Math.random() * 4);
+                    let sx, sy, ex, ey;
+                    const margin = 20;
+
+                    switch (edge) {
+                        case 0:
+                            sx = margin + Math.random() * (w - margin * 2);
+                            sy = -30 - Math.random() * 40;
+                            ex = sx + (Math.random() - 0.5) * 60;
+                            ey = h + 30 + Math.random() * 40;
+                            break;
+                        case 1:
+                            sx = w + 30 + Math.random() * 40;
+                            sy = margin + Math.random() * (h - margin * 2);
+                            ex = -30 - Math.random() * 40;
+                            ey = sy + (Math.random() - 0.5) * 60;
+                            break;
+                        case 2:
+                            sx = margin + Math.random() * (w - margin * 2);
+                            sy = h + 30 + Math.random() * 40;
+                            ex = sx + (Math.random() - 0.5) * 60;
+                            ey = -30 - Math.random() * 40;
+                            break;
+                        case 3:
+                            sx = -30 - Math.random() * 40;
+                            sy = margin + Math.random() * (h - margin * 2);
+                            ex = w + 30 + Math.random() * 40;
+                            ey = sy + (Math.random() - 0.5) * 60;
+                            break;
+                    }
+
+                    const size = 14 + Math.random() * 12;
+                    const dur = 3.8 + Math.random() * 2.8;
+                    const delay = Math.random() * 0.4;
+                    const rot0 = (Math.random() - 0.5) * 30;
+                    const rot1 = (Math.random() - 0.5) * 40;
+
+                    el.style.fontSize = size + 'px';
+                    el.style.setProperty('--sx', sx + 'px');
+                    el.style.setProperty('--sy', sy + 'px');
+                    el.style.setProperty('--ex', ex + 'px');
+                    el.style.setProperty('--ey', ey + 'px');
+                    el.style.setProperty('--r0', rot0 + 'deg');
+                    el.style.setProperty('--r1', rot1 + 'deg');
+
+                    el.style.animation = 'birthdayFloat ' + dur + 's cubic-bezier(0.25, 0.10, 0.25, 1.0) ' + delay +
+                        's forwards';
+
+                    const colors = ['#ff6b8a', '#ff3b6f', '#ff8a9f', '#ffb3c6', '#ffd166', '#ff9fbb', '#ffffff', '#ffabc1'];
+                    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    const shadowColors = ['rgba(255,80,130,0.5)', 'rgba(255,50,100,0.6)', 'rgba(255,180,60,0.5)',
+                        'rgba(255,255,255,0.3)'
+                    ];
+                    el.style.textShadow = '0 0 20px ' + shadowColors[Math.floor(Math.random() * shadowColors.length)] +
+                        ', 0 0 60px ' + shadowColors[Math.floor(Math.random() * shadowColors.length)];
+
+                    heartsLayer.appendChild(el);
+                    birthdayTexts.push(el);
+
+                    const totalDur = (dur + delay) * 1000 + 300;
+                    setTimeout(function() {
+                        if (el.parentNode) {
+                            el.remove();
+                            const idx = birthdayTexts.indexOf(el);
+                            if (idx > -1) birthdayTexts.splice(idx, 1);
+                        }
+                    }, totalDur);
+                }
+            }
+
+            function startBirthdayTexts() {
+                if (isBirthdayActive) return;
+                isBirthdayActive = true;
+                textBurstCount = 1;
+
+                for (let i = 0; i < 2; i++) {
+                    setTimeout(spawnBirthdayText, i * 150);
+                }
+
+                let intervalTime = 1500;
+                if (birthdayInterval) clearInterval(birthdayInterval);
+                birthdayInterval = setInterval(function() {
+                    spawnBirthdayText();
+                    if (intervalTime > 800) {
+                        intervalTime -= 20;
+                        clearInterval(birthdayInterval);
+                        birthdayInterval = setInterval(function() {
+                            spawnBirthdayText();
+                        }, intervalTime);
+                    }
+                }, intervalTime);
+            }
+
+            function stopBirthdayTexts() {
+                isBirthdayActive = false;
+                if (birthdayInterval) {
+                    clearInterval(birthdayInterval);
+                    birthdayInterval = null;
+                }
+                for (let i = birthdayTexts.length - 1; i >= 0; i--) {
+                    const el = birthdayTexts[i];
+                    if (el && el.parentNode) el.remove();
+                }
+                birthdayTexts = [];
+                const leftovers = heartsLayer.querySelectorAll('.birthday-text');
+                leftovers.forEach(function(el) { el.remove(); });
+                textBurstCount = 1;
+            }
+
+            // ─── timeupdate ──────────────────────────────────────────
+            function onTimeUpdate() {
+                if (isSeeking) return;
+                const target = stops[stage + 1];
+                if (target === undefined) return;
+
+                if (video.currentTime >= target - 0.04) {
+                    isSeeking = true;
+                    video.pause();
+                    video.currentTime = target;
+                    video.removeEventListener('timeupdate', onTimeUpdate);
+                    stage++;
+                    isSeeking = false;
+                    isPlaying = false;
+
+                    refreshBtn.classList.add('show');
+
+                    if (stage < stops.length - 1) {
+                        video.addEventListener('timeupdate', onTimeUpdate);
+                    }
+
+                    updateLabel();
+                }
+            }
+
+            // ─── play a stage ──────────────────────────────────────
+            function playStage() {
+                if (clickBtn.disabled) return;
+                if (isPlaying) return;
+                if (isSeeking) return;
+
+                // ── stage 0 → 1 (1st click) ──
+                if (stage === 0) {
+                    startMusic();
+                    spawnHeartsGradually(18, 120, 2);
+
+                    video.removeEventListener('timeupdate', onTimeUpdate);
+                    video.addEventListener('timeupdate', onTimeUpdate);
+                    isPlaying = true;
+                    video.play().catch(function(err) {
+                        console.warn('Video play failed:', err);
+                        isPlaying = false;
+                    });
+                    return;
+                }
+
+                // ── stage 1 → 2 (2nd click) ──
+                if (stage === 1) {
+                    startMusic();
+                    spawnHeartsGradually(18, 120, 2);
+
+                    video.removeEventListener('timeupdate', onTimeUpdate);
+                    video.addEventListener('timeupdate', onTimeUpdate);
+                    isPlaying = true;
+                    video.play().catch(function(err) {
+                        console.warn('Video play failed:', err);
+                        isPlaying = false;
+                    });
+                    return;
+                }
+
+                // ── stage 2 → 3 (3rd click) ──
+                if (stage === 2) {
+                    startMusic();
+                    spawnHeartsGradually(18, 120, 2);
+
+                    video.removeEventListener('timeupdate', onTimeUpdate);
+                    video.addEventListener('timeupdate', onTimeUpdate);
+                    isPlaying = true;
+                    video.play().catch(function(err) {
+                        console.warn('Video play failed:', err);
+                        isPlaying = false;
+                    });
+                    return;
+                }
+
+                // ── stage 3 → 4 (4th click = last) ──
+                if (stage === 3 && !lastClickDone) {
+                    clickBtn.classList.add('deep');
+                    clickBtn.disabled = true;
+                    lastClickDone = true;
+
+                    spawnHeartsGradually(30, 150, 3);
+                    startBirthdayTexts();
+                    startMusic();
+
+                    video.removeEventListener('timeupdate', onTimeUpdate);
+                    video.addEventListener('timeupdate', onTimeUpdate);
+                    isPlaying = true;
+                    video.play().catch(function(err) {
+                        console.warn('Video play failed:', err);
+                        isPlaying = false;
+                        clickBtn.disabled = false;
+                    });
+                    return;
+                }
+
+                // ── যদি শেষ হয়ে যায় ──
+                if (stage >= stops.length - 1) return;
+            }
+
+            // ─── event listeners ──────────────────────────────────────
+            clickBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (clickBtn.disabled) return;
+                playStage();
+            });
+
+            refreshBtn.addEventListener('click', function() {
+                video.removeEventListener('timeupdate', onTimeUpdate);
+                goToRest();
+                heartsLayer.innerHTML = '';
+                stageLabel.classList.remove('show');
+                updateLabel();
+                const leftovers = heartsLayer.querySelectorAll('.birthday-text');
+                leftovers.forEach(function(el) { el.remove(); });
+            });
+
+            // ─── init ──────────────────────────────────────────────────
+            if (video.readyState >= 1) {
+                video.currentTime = stops[0];
+                updateLabel();
+            } else {
+                video.addEventListener('loadedmetadata', function() {
+                    video.currentTime = stops[0];
+                    updateLabel();
+                });
+            }
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    if (!video.paused) video.pause();
+                }
+            });
+
+            video.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+            console.log('✅ টাইমলাইন: 0.19 → 1.50 → 3.03 → 4.05 → 19.00');
+        })();
+    </script>
+
+</body>
+</html>
