@@ -94,11 +94,11 @@
             z-index: 2;
         }
 
-        /* ─── কন্ট্রোল – আরও উপরে ─── */
+        /* ─── কন্ট্রোল – ক্লিক বাটন বেশি উপরে ─── */
         .controls {
             position: absolute;
             left: 50%;
-            bottom: 7vh; /* আগে 6vh → এখন 7vh (আরও উপরে) */
+            bottom: 9vh; /* আগে 7vh → এখন 9vh (ক্লিক বেশি উপরে) */
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
@@ -292,7 +292,7 @@
 
         @media (max-width: 480px) {
             .controls {
-                bottom: 6vh; /* ছোট ফোনে সামঞ্জস্য */
+                bottom: 7vh; /* ছোট ফোনে ক্লিক উপরে */
                 gap: 1.2vh;
             }
             #clickBtn {
@@ -313,7 +313,7 @@
         }
         @media (max-width: 380px) {
             .controls {
-                bottom: 5vh;
+                bottom: 6vh;
                 gap: 1vh;
             }
             #clickBtn {
@@ -334,7 +334,7 @@
         }
         @media (min-width: 1024px) {
             .controls {
-                bottom: 9vh; /* বড় স্ক্রিনে আরও উপরে */
+                bottom: 11vh; /* বড় স্ক্রিনে আরও উপরে */
                 gap: 2vh;
             }
             #clickBtn {
@@ -783,7 +783,7 @@
 
             video.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
-            console.log('✅ বাটন ও রিফ্রেশ আরও উপরে');
+            console.log('✅ ক্লিক বাটন বেশি উপরে, রিফ্রেশ সামান্য উপরে');
         })();
     </script>
 
