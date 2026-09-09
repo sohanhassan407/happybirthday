@@ -93,21 +93,32 @@
             pointer-events: none;
             z-index: 2;
         }
+
+        /* ─── কন্ট্রোল – আরও উপরে + আরও ছোট ─── */
         .controls {
             position: absolute;
             left: 50%;
-            bottom: 6%;
+            bottom: 16vh; /* আগে 14vh → এখন 16vh (আরও উপরে) */
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
+            gap: 1.5vh;
             z-index: 5;
+            width: auto;
+            max-width: 90vw;
         }
+
         #clickBtn {
             position: relative;
-            padding: 13px 34px;
-            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2vh 3vw; /* আরও ছোট */
+            min-width: 22vw; /* আরও ছোট */
+            max-width: 80vw;
+            font-size: clamp(12px, 1.8vh, 18px); /* আরও ছোট */
+            font-weight: 600;
             letter-spacing: 0.06em;
             color: #fff8f6;
             background: linear-gradient(135deg, #c81f4d, #ff5c7a);
@@ -120,8 +131,9 @@
             user-select: none;
             touch-action: manipulation;
             text-align: center;
-            min-width: 140px;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
         }
         #clickBtn:hover:not(:disabled) {
             transform: translateY(-2px);
@@ -147,15 +159,17 @@
         }
 
         #refreshBtn {
-            width: 38px;
-            height: 38px;
+            width: 4vh;
+            height: 4vh;
+            min-width: 30px;
+            min-height: 30px;
             border-radius: 50%;
             border: 1px solid rgba(255, 255, 255, 0.3);
             background: rgba(20, 10, 14, 0.35);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             color: #fff8f6;
-            font-size: 17px;
+            font-size: clamp(13px, 2vh, 20px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,6 +178,7 @@
             pointer-events: none;
             transition: opacity 0.35s ease, transform 0.35s ease, background 0.2s ease;
             touch-action: manipulation;
+            flex-shrink: 0;
         }
         #refreshBtn.show {
             opacity: 1;
@@ -276,28 +291,58 @@
         }
 
         @media (max-width: 480px) {
-            #clickBtn {
-                padding: 11px 24px;
-                font-size: 14px;
-                min-width: 120px;
+            .controls {
+                bottom: 14vh;
             }
-            .loader-dots span {
-                width: 14px;
-                height: 14px;
-                gap: 12px;
+            #clickBtn {
+                padding: 1vh 2.8vw;
+                min-width: 30vw;
+                font-size: clamp(11px, 1.6vh, 16px);
             }
             .birthday-text {
                 font-size: 13px;
             }
+            #refreshBtn {
+                width: 3.8vh;
+                height: 3.8vh;
+                min-width: 28px;
+                min-height: 28px;
+                font-size: clamp(11px, 1.8vh, 17px);
+            }
         }
         @media (max-width: 380px) {
+            .controls {
+                bottom: 12vh;
+            }
+            #clickBtn {
+                padding: 0.8vh 2.5vw;
+                min-width: 36vw;
+                font-size: clamp(10px, 1.4vh, 14px);
+            }
             .birthday-text {
                 font-size: 11px;
             }
+            #refreshBtn {
+                width: 3.2vh;
+                height: 3.2vh;
+                min-width: 24px;
+                min-height: 24px;
+                font-size: clamp(10px, 1.4vh, 15px);
+            }
+        }
+        @media (min-width: 1024px) {
+            .controls {
+                bottom: 18vh;
+            }
             #clickBtn {
-                padding: 9px 18px;
-                font-size: 12px;
-                min-width: 100px;
+                padding: 1.4vh 2.5vw;
+                min-width: 16vw;
+                font-size: clamp(15px, 2.2vh, 24px);
+            }
+            #refreshBtn {
+                width: 5vh;
+                height: 5vh;
+                font-size: clamp(17px, 2.5vh, 26px);
             }
         }
     </style>
@@ -337,11 +382,8 @@
             const heartsLayer = document.getElementById('heartsLayer');
             const stageLabel = document.getElementById('stageLabel');
 
-            // ভিডিওর সাউন্ড চালু
             video.muted = false;
 
-            // ─── নতুন টাইমলাইন ──────────────────────────────────────
-            // 0.19 একই, 1.20 → 1.50 (0.30 যোগ), বাকি একই
             const stops = [0.19, 1.50, 3.03, 4.05, 19.00];
             let stage = 0;
             let musicStarted = false;
@@ -358,7 +400,6 @@
 
             let loadingHidden = false;
 
-            // ─── loading screen ──────────────────────────────────────
             function hideLoading() {
                 if (loadingHidden) return;
                 loadingHidden = true;
@@ -378,7 +419,6 @@
             }
             onVideoReady();
 
-            // ─── restart ─────────────────────────────────────────────
             function goToRest() {
                 video.pause();
                 video.currentTime = stops[0];
@@ -414,7 +454,6 @@
                 stageLabel.classList.add('show');
             }
 
-            // ─── ধীরে ধীরে লাভ ──────────────────────────────────────
             function spawnHeartsGradually(totalCount, delayBetween, heartsPerBatch) {
                 let spawned = 0;
                 const interval = setInterval(function() {
@@ -484,7 +523,6 @@
                 }, (dur + delay) * 1000 + 300);
             }
 
-            // ─── birthday text ──────────────────────────────────────
             function spawnBirthdayText() {
                 if (!isBirthdayActive) return;
 
@@ -611,7 +649,6 @@
                 textBurstCount = 1;
             }
 
-            // ─── timeupdate ──────────────────────────────────────────
             function onTimeUpdate() {
                 if (isSeeking) return;
                 const target = stops[stage + 1];
@@ -636,17 +673,14 @@
                 }
             }
 
-            // ─── play a stage ──────────────────────────────────────
             function playStage() {
                 if (clickBtn.disabled) return;
                 if (isPlaying) return;
                 if (isSeeking) return;
 
-                // ── stage 0 → 1 (1st click) ──
                 if (stage === 0) {
                     startMusic();
                     spawnHeartsGradually(18, 120, 2);
-
                     video.removeEventListener('timeupdate', onTimeUpdate);
                     video.addEventListener('timeupdate', onTimeUpdate);
                     isPlaying = true;
@@ -657,11 +691,9 @@
                     return;
                 }
 
-                // ── stage 1 → 2 (2nd click) ──
                 if (stage === 1) {
                     startMusic();
                     spawnHeartsGradually(18, 120, 2);
-
                     video.removeEventListener('timeupdate', onTimeUpdate);
                     video.addEventListener('timeupdate', onTimeUpdate);
                     isPlaying = true;
@@ -672,11 +704,9 @@
                     return;
                 }
 
-                // ── stage 2 → 3 (3rd click) ──
                 if (stage === 2) {
                     startMusic();
                     spawnHeartsGradually(18, 120, 2);
-
                     video.removeEventListener('timeupdate', onTimeUpdate);
                     video.addEventListener('timeupdate', onTimeUpdate);
                     isPlaying = true;
@@ -687,7 +717,6 @@
                     return;
                 }
 
-                // ── stage 3 → 4 (4th click = last) ──
                 if (stage === 3 && !lastClickDone) {
                     clickBtn.classList.add('deep');
                     clickBtn.disabled = true;
@@ -708,11 +737,9 @@
                     return;
                 }
 
-                // ── যদি শেষ হয়ে যায় ──
                 if (stage >= stops.length - 1) return;
             }
 
-            // ─── event listeners ──────────────────────────────────────
             clickBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 if (clickBtn.disabled) return;
@@ -729,7 +756,6 @@
                 leftovers.forEach(function(el) { el.remove(); });
             });
 
-            // ─── init ──────────────────────────────────────────────────
             if (video.readyState >= 1) {
                 video.currentTime = stops[0];
                 updateLabel();
@@ -748,7 +774,7 @@
 
             video.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
-            console.log('✅ টাইমলাইন: 0.19 → 1.50 → 3.03 → 4.05 → 19.00');
+            console.log('✅ বাটন আরও ছোট + আরও উপরে');
         })();
     </script>
 
