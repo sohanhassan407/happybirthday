@@ -94,16 +94,16 @@
             z-index: 2;
         }
 
-        /* ─── কন্ট্রোল – নিচে + বড় ─── */
+        /* ─── কন্ট্রোল – Click PlZ নিচে + বড়, রিফ্রেশ ছোট + কাছে ─── */
         .controls {
             position: absolute;
             left: 50%;
-            bottom: 8vh; /* নিচে নামানো */
+            bottom: 4vh; /* আরও নিচে */
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2.5vh; /* রিফ্রেশ বাটনের জন্য গ্যাপ */
+            gap: 1.5vh; /* কাছাকাছি */
             z-index: 5;
             width: auto;
             max-width: 90vw;
@@ -114,11 +114,11 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 2vh 5vw; /* বড় */
-            min-width: 34vw; /* বড় */
-            max-width: 80vw;
-            font-size: clamp(16px, 2.8vh, 24px); /* বড় */
-            font-weight: 600;
+            padding: 2.4vh 6vw; /* আরও বড় */
+            min-width: 38vw; /* আরও বড় */
+            max-width: 85vw;
+            font-size: clamp(18px, 3.2vh, 28px); /* আরও বড় */
+            font-weight: 700;
             letter-spacing: 0.06em;
             color: #fff8f6;
             background: linear-gradient(135deg, #c81f4d, #ff5c7a);
@@ -159,17 +159,17 @@
         }
 
         #refreshBtn {
-            width: 5.5vh;
-            height: 5.5vh;
-            min-width: 40px;
-            min-height: 40px;
+            width: 4vh; /* ছোট */
+            height: 4vh;
+            min-width: 30px;
+            min-height: 30px;
             border-radius: 50%;
             border: 1px solid rgba(255, 255, 255, 0.3);
             background: rgba(20, 10, 14, 0.35);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             color: #fff8f6;
-            font-size: clamp(18px, 2.8vh, 26px);
+            font-size: clamp(14px, 2.2vh, 20px); /* ছোট */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -292,60 +292,60 @@
 
         @media (max-width: 480px) {
             .controls {
-                bottom: 6vh;
-                gap: 2vh;
+                bottom: 3vh;
+                gap: 1.2vh;
             }
             #clickBtn {
-                padding: 1.8vh 4vw;
-                min-width: 40vw;
-                font-size: clamp(14px, 2.2vh, 20px);
+                padding: 2vh 5vw;
+                min-width: 44vw;
+                font-size: clamp(16px, 2.8vh, 24px);
             }
             .birthday-text {
                 font-size: 13px;
             }
             #refreshBtn {
-                width: 4.8vh;
-                height: 4.8vh;
-                min-width: 34px;
-                min-height: 34px;
-                font-size: clamp(15px, 2.4vh, 22px);
+                width: 3.8vh;
+                height: 3.8vh;
+                min-width: 28px;
+                min-height: 28px;
+                font-size: clamp(12px, 2vh, 18px);
             }
         }
         @media (max-width: 380px) {
             .controls {
-                bottom: 4vh;
-                gap: 1.5vh;
+                bottom: 2vh;
+                gap: 1vh;
             }
             #clickBtn {
-                padding: 1.5vh 3.5vw;
-                min-width: 46vw;
-                font-size: clamp(12px, 2vh, 18px);
+                padding: 1.6vh 4vw;
+                min-width: 50vw;
+                font-size: clamp(14px, 2.4vh, 20px);
             }
             .birthday-text {
                 font-size: 11px;
             }
             #refreshBtn {
-                width: 4.2vh;
-                height: 4.2vh;
-                min-width: 30px;
-                min-height: 30px;
-                font-size: clamp(13px, 2vh, 20px);
+                width: 3.2vh;
+                height: 3.2vh;
+                min-width: 24px;
+                min-height: 24px;
+                font-size: clamp(10px, 1.6vh, 16px);
             }
         }
         @media (min-width: 1024px) {
             .controls {
-                bottom: 10vh;
-                gap: 3vh;
+                bottom: 6vh;
+                gap: 2vh;
             }
             #clickBtn {
-                padding: 2.2vh 4vw;
-                min-width: 24vw;
-                font-size: clamp(20px, 3vh, 30px);
+                padding: 2.6vh 5vw;
+                min-width: 28vw;
+                font-size: clamp(22px, 3.6vh, 34px);
             }
             #refreshBtn {
-                width: 6vh;
-                height: 6vh;
-                font-size: clamp(22px, 3.2vh, 32px);
+                width: 4.5vh;
+                height: 4.5vh;
+                font-size: clamp(18px, 2.6vh, 26px);
             }
         }
     </style>
@@ -399,13 +399,10 @@
             let isBirthdayActive = false;
             let textBurstCount = 1;
 
-            // ─── টেক্সট ভেরিয়েন্ট: Happy Birthday বেশি, বাকি কম ───
+            // Happy Birthday বেশি, Keya ও love you কম
             const textVariants = [
-                'Happy Birthday💖',
-                'Happy Birthday💖',
-                'Happy Birthday💖',
-                'Happy Birthday💖',
-                'Happy Birthday💖',
+                'Happy Birthday💖', 'Happy Birthday💖', 'Happy Birthday💖',
+                'Happy Birthday💖', 'Happy Birthday💖',
                 'Keya😫💖',
                 'love you😫'
             ];
@@ -786,7 +783,7 @@
 
             video.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
-            console.log('✅ বাটন নিচে + বড় + রিফ্রেশ ঠিক + Happy Birthday বেশি');
+            console.log('✅ Click PlZ নিচে+বড়, রিফ্রেশ কাছে+ছোট');
         })();
     </script>
 
